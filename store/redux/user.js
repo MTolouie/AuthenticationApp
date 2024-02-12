@@ -8,13 +8,13 @@ const usersSlice = createSlice({
     email: "",
   },
   reducers: {
-    authenticate: (state, action) => {
+    authenticateUser: (state, action) => {
       state.token = action.payload.token;
       state.email = action.payload.email;
       state.isAuthenticated = true;
-      console.log(state.isAuthenticated);
+
     },
-    logout: (state, action) => {
+    logUserOut: (state, action) => {
       state.token = null;
       state.email = null;
       state.isAuthenticated = false;
@@ -22,6 +22,6 @@ const usersSlice = createSlice({
   },
 });
 
-export const authenticateUser = usersSlice.actions.authenticate;
-export const logUserOut = usersSlice.actions.logout;
+export const authenticateUser = usersSlice.actions.authenticateUser;
+export const logUserOut = usersSlice.actions.logUserOut;
 export default usersSlice.reducer;
