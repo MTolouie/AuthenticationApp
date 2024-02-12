@@ -1,40 +1,37 @@
 import axios from "axios";
+import { Alert } from "react-native";
 
 const API_KEY = "AIzaSyCccvYNSO5EiwtGGgq7tfoD2khPoYLZUXY";
 export const authenticate = async (mode, email, password) => {
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:${mode}?key=${API_KEY}`;
+  const response = await axios.post(url, {
+    email: email,
+    password: password,
+    returnSecureToken: true,
+  });
 
-  try {
-    const response = await axios.post(url, {
-      email: email,
-      password: password,
-      returnSecureToken: true,
-    });
-    console.log(response.data);
-  } catch (error) {
-    if (
-      error.response &&
-      error.response.data &&
-      error.response.data.error &&
-      error.response.data.error.message
-    ) {
-      console.error(
-        "Error While Authenticating:",
-        error.response.data.error.message
-      );
-    } else {
-      console.error("An error occurred while authenticating:", error.message);
-    }
-    throw error;
-  }
+  const token = response.data.idToken;
+  const userEmail = response.data.email;
+
+  return { token: token, email: userEmail };
 };
 
 export async function createUser(email, password) {
-  await authenticate("signUp", email, password);
+  try {
+    const result = await authenticate("signUp", email, password);
+    return result;
+  } catch (error) {
+    Alert.alert("Signup Failed. Please Check Your Input Or Try Again Later.");
+  }
 }
 
 export async function login(email, password) {
-  await authenticate("signInWithPassword", email, password);
+  try {
+    const result = await authenticate("signInWithPassword", email, password);
+    return result;
+  } catch (error) {
+    Alert.alert("Login Failed. Please Check Your Input Or Try Again Later.");
+  }
 }
 // export async function createUser(email, password) {
 //   console.log(email + "and" + password);
