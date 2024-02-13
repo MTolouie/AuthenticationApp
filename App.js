@@ -9,7 +9,10 @@ import { Colors } from "./constants/styles";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { UseSelector } from "react-redux";
 import IconButton from "./components/ui/IconButton";
-import { logUserOut } from "./store/redux/user";
+import { logUserOut, setToken } from "./store/redux/user";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen";
 const Stack = createNativeStackNavigator();
 
 function AuthStack() {
@@ -55,9 +58,31 @@ function AuthenticatedStack() {
 }
 
 function Navigation() {
+  const dispatch = useDispatch();
+  const [isTryingLogin, setIsTryingLogin] = useState(true);
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await AsyncStorage.getItem("token");
+
+      if (token) {
+        dispatch(setToken({ token: token }));
+      }
+
+      setIsTryingLogin(false);
+    };
+
+    fetchToken();
+  }, []);
   const isUserAuthenticated = useSelector(
     (state) => state.user.isAuthenticated
   );
+
+  if (isTryingLogin) {
+    SplashScreen.preventAutoHideAsync(); // splash screen until loading
+    return null;
+  }
+
+  SplashScreen.hideAsync();
 
   return (
     <NavigationContainer>
